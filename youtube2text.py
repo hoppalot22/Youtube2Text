@@ -7,7 +7,7 @@ import wave
 import json
 import subprocess
 
-
+print(sys.version)
 
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__)) + "\\downloads"
@@ -50,7 +50,7 @@ def file2text(inFileName):
 
     # build the model and recognizer objects.
     #model = Model(r"C:\Users\Marc\Documents\AH\Code\Youtube2Text\models\vosk-model-en-us-0.22")
-    model = Model(r"C:\Users\Marc\Documents\AH\Code\Youtube2Text\models\vosk-model-small-en-us-0.15")
+    model = Model(r"F:\Python\vosk models\vosk-model-en-us-0.22")
     recognizer = KaldiRecognizer(model, wf.getframerate())
     recognizer.SetWords(True)
     
@@ -63,7 +63,7 @@ def file2text(inFileName):
     while True:
         counter += 1
         data = wf.readframes(chunkSize)
-        print(counter*chunkSize/numFrames*100)
+        print(round(counter*chunkSize/numFrames*100, 3))
         if (len(data) == 0):
             break
             
@@ -78,7 +78,13 @@ def file2text(inFileName):
     textResults = resultDict["text"].split(' ')
     readableResult = []
     line = ''
+    
+    print("Doing lines")
+    
     for i,word in enumerate(textResults):
+    
+        print(round(i/len(textResults)*100,2))
+        
         line += word + " "
         if (i+1)%wordsPerLine == 0:
             readableResult.append(line + '\n')
@@ -86,23 +92,32 @@ def file2text(inFileName):
     readableResult.append(line)
     
     print("Writing Results")
+    print ("3")
     
     # write results to a file
     with open(outfileResults, 'w') as output:
         output.write(results)
 
+    print ("2")
+
     # write text portion of results to a file
     with open(outfileText, 'w') as output:
         output.write(json.dumps(textResults, indent=4))
+        
+    print ("1")
         
     with open(outfileRead, 'w') as output:
         output.writelines(readableResult)
     
     print ("Complete!")
 
+video = sys.argv[1]
 
-link = sys.argv[1]
-file = Download(link)
+if(".com" in video):
+
+    file = Download(video)
+else:
+    file = video
 wav = convert2wav(file)
 file2text(wav)
 
